@@ -1,0 +1,16 @@
+{
+  "name": "nextword",
+  "version": "2.0.0",
+  "description": "Game sambung kata multiplayer realtime",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "socket.io": "^4.7.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

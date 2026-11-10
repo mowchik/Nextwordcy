@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>NextWord — Sambung Kata Seru!</title>
+  <meta name="description" content="Game sambung kata multiplayer realtime." />
+  <meta name="theme-color" content="#060a0f" />
+  <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="NextWord" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;600;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/main.css" />
+</head>
+<body>
+
+<!-- LOADING SCREEN -->
+<div class="loading-screen" id="loading-screen">
+  <div class="loading-inner">
+    <div class="loading-logo" id="loading-logo">NEXTWORD</div>
+    <div class="loading-bar-wrap">
+      <div class="loading-bar-fill" id="loading-bar-fill"></div>
+    </div>
+    <div class="loading-text" id="loading-text">Memuat...</div>
+  </div>
+</div>
+
+<div class="bg-grid"></div>
+<div class="bg-glow-tl"></div>
+<div class="bg-glow-br"></div>
+<div class="particles" id="particles"></div>
+<div class="feedback-flash" id="feedback-flash"></div>
+<div class="toast-container" id="toast-container"></div>
+<div class="streak-popup hidden" id="streak-popup"></div>
+<div class="streak-popup powerup-popup hidden" id="powerup-popup"></div>
+
+<!-- SCREEN 1: LANDING -->
+<div class="screen" id="landing-screen">
+  <div class="logo-container">
+    <div class="logo-tag">⚡ Multiplayer Real-time</div>
+    <h1 class="logo-title" id="logo-title">NEXTWORD</h1>
+    <div class="logo-line"></div>
+    <div class="logo-subtitle">Sambung kata · Kalahkan lawan · Buktiin dirimu</div>
+  </div>
+  <div class="input-card">
+    <label class="field-label" for="name-input">Nama Pemain</label>
+    <input type="text" id="name-input" class="neon-input" placeholder="Nama kamu (3–12 karakter)" maxlength="12" autocomplete="off" spellcheck="false" aria-label="Nama pemain" />
+    <div class="validation-msg" id="validation-msg"></div>
+    <div class="btn-row" style="margin-top:24px;">
+      <button class="btn btn-primary" id="create-btn">🏠 BUAT ROOM</button>
+      <button class="btn btn-outline" id="join-btn">🔗 JOIN ROOM</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL: JOIN ROOM -->
+<div class="modal-overlay hidden" id="join-modal">
+  <div class="modal">
+    <div class="modal-title">MASUK ROOM</div>
+    <label class="field-label">Kode Room (5 karakter)</label>
+    <input type="text" id="room-code-input" class="neon-input" placeholder="Contoh: ABCDE" maxlength="6" style="text-align:center;letter-spacing:8px;font-size:22px;font-family:'Orbitron',monospace;" autocomplete="off" spellcheck="false" aria-label="Kode room" />
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px;">
+      <button class="btn btn-outline" id="cancel-join-btn">BATAL</button>
+      <button class="btn btn-primary" id="confirm-join-btn">MASUK!</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 2: LOBBY -->
+<div class="screen hidden" id="lobby-screen">
+  <div class="lobby-container">
+    <div class="lobby-header">
+      <div class="lobby-title">KODE ROOM KAMU</div>
+      <div class="room-code-display" id="lobby-room-code">-----</div>
+      <div class="copy-hint">👆 Tap untuk salin · bagiin ke temen!</div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">
+        <span>YANG UDAH GABUNG</span>
+        <span class="player-count-badge" id="player-count">0/5</span>
+      </div>
+      <div class="player-list" id="player-list"></div>
+    </div>
+    <div class="lobby-status pulse" id="lobby-status">Nunggu yang lain gabung...</div>
+    <button class="btn btn-gold btn-full hidden" id="start-btn" style="margin-top:12px;">▶ MULAI GAME!</button>
+    <div class="panel rules-panel" style="margin-top:14px;">
+      <div class="panel-header">CARA MAINNYA</div>
+      <div class="rules-list">
+        <div class="rule-item">🔤 Sambung kata dari akhiran kata sebelumnya</div>
+        <div class="rule-item">⏱️ 10 detik per giliran — jangan kelamaan mikir!</div>
+        <div class="rule-item">❤️ 3 nyawa — <strong>kata salah tidak langsung ganti giliran!</strong></div>
+        <div class="rule-item">↩️ Giliran pindah hanya kalau nyawa habis atau salah 2x berturut-turut</div>
+        <div class="rule-item">📏 Kata ≥9 huruf → sambung 3 huruf · ≥6 huruf → 2 huruf</div>
+        <div class="rule-item">🚫 Kata yang udah dipakai &amp; huruf X = DILARANG</div>
+        <div class="rule-item">🏆 Pemain terakhir yang bertahan = MENANG!</div>
+        <div class="rule-item">⏸️ Tombol <strong>PAUSE</strong> pojok kanan atas — siapa aja bisa pause/lanjut kapan aja. Kalau ada yang refresh / putus koneksi, slot-nya langsung kosong &amp; game otomatis di-pause — lanjut otomatis setelah player keluar!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 3: GAME -->
+<div class="screen hidden" id="game-screen">
+  <div class="game-container">
+    <!-- Header -->
+    <div class="game-header">
+      <div class="game-logo">NW</div>
+      <div class="game-center-info">
+        <div class="game-room-code" id="game-room-code">ROOM: -----</div>
+        <div class="game-round-info" id="game-round-info">0 kata terpakai</div>
+      </div>
+      <div class="header-right-btns">
+        <button class="btn-pause-game" id="pause-game-btn" title="Pause Game">
+          <svg class="pause-icon-svg" id="pause-icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <!-- Pause: two bars -->
+            <rect class="bar bar-left"  x="5"  y="4" width="4" height="16" rx="1.5"/>
+            <rect class="bar bar-right" x="15" y="4" width="4" height="16" rx="1.5"/>
+            <!-- Play: triangle (hidden by default) -->
+            <polygon class="play-tri" points="7,3 21,12 7,21" style="display:none"/>
+          </svg>
+        </button>
+        <button class="btn-exit-game" id="exit-game-btn" title="Keluar">✕</button>
+      </div>
+    </div>
+
+    <!-- Players -->
+    <div class="players-row" id="players-row"></div>
+
+    <!-- Prefix Display — berubah realtime saat mengetik -->
+    <div class="prefix-section">
+      <div class="prefix-label" id="prefix-label">AWALI DENGAN</div>
+      <div class="prefix-value" id="prefix-value"><span class="pfx-cursor">_</span></div>
+      <div class="prefix-hint" id="prefix-hint">Nunggu giliran...</div>
+      <!-- Typing realtime dari lawan -->
+      <div class="opponent-typing" id="opponent-typing"></div>
+      <!-- Legend warna -->
+      <div class="prefix-legend">
+        <span class="legend-item"><span class="dot dot-required"></span>Awalan wajib</span>
+        <span class="legend-item"><span class="dot dot-extra"></span>Tambahan kamu</span>
+      </div>
+    </div>
+
+    <!-- Timer -->
+    <div class="timer-section">
+      <div class="timer-label">WAKTU</div>
+      <div class="timer-bar-wrap">
+        <div class="timer-bar-fill" id="timer-bar-fill" style="width:100%"></div>
+      </div>
+      <div class="timer-number" id="timer-number">10</div>
+    </div>
+
+    <!-- Input -->
+    <div class="input-section">
+      <input type="text" id="word-input" class="word-input" placeholder="Ketik kata di sini..." autocomplete="off" spellcheck="false" disabled aria-label="Ketik kata" />
+      <button class="submit-btn" id="submit-btn" disabled>KIRIM</button>
+    </div>
+
+    <!-- Word History -->
+    <div class="word-history-header">
+      <span>📜 KATA TERPAKAI</span>
+      <span class="word-count-badge" id="word-count-badge">0 kata</span>
+    </div>
+    <div class="word-history" id="word-history"></div>
+  </div>
+</div>
+
+<!-- SCREEN 4: GAME OVER -->
+<div class="screen hidden" id="gameover-screen">
+  <div class="gameover-card win" id="gameover-card">
+    <div class="gameover-bg-glow"></div>
+    <div class="gameover-confetti" id="gameover-confetti"></div>
+    <div class="gameover-icon" id="gameover-icon">🏆</div>
+    <div class="gameover-title" id="gameover-title">VICTORY!</div>
+    <div class="gameover-winner-name" id="gameover-winner-name">PEMENANG: —</div>
+    <div class="stats-bar" id="stats-bar"></div>
+    <div class="rankings-list" id="rankings-list"></div>
+    <div class="gameover-actions">
+      <button class="btn btn-outline" id="exit-btn">← KELUAR</button>
+      <button class="btn btn-primary" id="play-again-btn">MAIN LAGI 🔄</button>
+    </div>
+    <div id="play-again-hint" style="margin-top:10px;font-family:'Rajdhani',sans-serif;font-size:12px;color:var(--text-muted);letter-spacing:1px;text-align:center;"></div>
+  </div>
+</div>
+
+<!-- MODAL: LEAVE -->
+<div class="modal-overlay hidden" id="leave-modal">
+  <div class="modal">
+    <div class="modal-title" style="color:var(--neon-red);">YAKIN MAU KELUAR?</div>
+    <p style="font-family:'Rajdhani',sans-serif;font-size:14px;color:var(--text-muted);text-align:center;margin-bottom:24px;line-height:1.8;letter-spacing:0.5px;">
+      Kamu bakal keluar dari room ini.<br/>Progress game langsung hilang loh!
+    </p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <button class="btn btn-outline" id="cancel-leave-btn">TETAP MAIN</button>
+      <button class="btn btn-danger" id="confirm-leave-btn">CABUT AJA</button>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-text">
+      <span>&copy; 2026</span>
+      <span class="footer-dot"></span>
+      <span class="footer-author">Galuh Suci Prawesti</span>
+      <span class="footer-dot"></span>
+      <span>NextWord Game</span>
+    </div>
+    <div class="footer-ig-row">
+      <span class="footer-follow-text">Follow IG:</span>
+      <a href="https://www.instagram.com/prawes.cy?igsh=eG15N2ZrNmxuNDhh" target="_blank" rel="noopener noreferrer" class="footer-ig-link">
+        <svg class="footer-ig-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+          <circle cx="12" cy="12" r="4"/>
+          <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/>
+        </svg>
+        <span>Instagram</span>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  window._ioConnect = function() {
+    return io({ reconnection: true, reconnectionAttempts: Infinity, reconnectionDelay: 1000, reconnectionDelayMax: 5000, timeout: 45000, transports: ['websocket','polling'] });
+  };
+</script>
+<script src="/shared/constants.js"></script>
+<script src="/js/state.js"></script>
+<script src="/js/toast.js"></script>
+<script src="/js/ui.js"></script>
+<script src="/js/socket.js"></script>
+<script src="/js/app.js"></script>
+
+</body>
+</html>
